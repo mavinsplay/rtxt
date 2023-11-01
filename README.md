@@ -9,3 +9,5 @@
 после нажмите на "PATH" в нижнем окне, и нажмите на кнопку изменить, в открывшемся окне нажмите на кнопку создать и
 впишите туда путь к папке, в которую вы установили tesseract (обычно это C:\Program Files\Tesseract-OCR) и перезагрузите пк
 более подробная инструкция по установке <a href="https://medium.com/@marioruizgonzalez.mx/how-install-tesseract-orc-and-pytesseract-on-windows-68f011ad8b9b">клик</a>
+
+установочные файлы и standalone версия приложения: <a href="https://drive.google.com/drive/folders/1fqUc3r0n68i_xk_uVAMExMFq1Ow8gl0E?usp=drive_link">клик</a>
