@@ -47,11 +47,11 @@ class rtxt_app(QMainWindow, ui):
             screenshot(filepath=self.screnhot_path, coordinates=(
                 self.x1, self.y1, self.x2, self.y2))
             lang = self.language_comboBox.currentText()
-            self.text_editor.setPlainText(
-                processimage(self.screnhot_path, lang=lang))
+            self.text_editor.setPlainText( # выведение текста со скриншота на панель справа
+                processimage(self.screnhot_path, lang=lang)) # обработка скриншота
             self.statusbar.showMessage('')
         except (SystemError, TypeError, ValueError) as er:  # отлавливание ошибок из-за координат
-            if type(er) is SystemError or type(er) is ValueError:
+            if type(er) is SystemError or type(er) is ValueError: # если ошиббки связанаы со скриншотом
                 self.statusbar.showMessage(
                     'ОШИБКА: xy1 должен быть меньше чем xy2')
             else:
@@ -61,47 +61,47 @@ class rtxt_app(QMainWindow, ui):
     def deletetags(self, txt):
         # вспомогательная функция для удаления xml тегов в строке
         text_document = QTextDocument()
-        text_document.setHtml(txt)
-        text_without_tags = text_document.toPlainText()
+        text_document.setHtml(txt) # создание html версии текста
+        text_without_tags = text_document.toPlainText() # приведение html к обычной строке
         return text_without_tags
 
     def check_type(self, data):
         # функция для множественного анализа, определяет тип данных
         try:
-            date = dt.strptime(data, '%Y-%m-%d')
+            date = dt.strptime(data, '%Y-%m-%d') # попытка создать дату
             return 'date'
         except ValueError:
             pass
         try:
-            x = int(data)
+            x = int(data) # попытка создать целое число
             return 'int'
         except ValueError:
             pass
         try:
-            x = float(data)
+            x = float(data) # попытка создать дробное число
             return 'float'
         except ValueError:
             pass
-        return 'str'
+        return 'str' # возвращаем строку если не подходит ни один параматр
 
     def get_tableData(self):
         # функция для получения данных из таблицы
-        num_rows = self.tableWidget.rowCount()
-        items = [(self.tableWidget.item(row, 1).text(),
+        num_rows = self.tableWidget.rowCount() # получаем количество нужных рядов
+        items = [(self.tableWidget.item(row, 1).text(), # получаем элементы из таблицы
                   self.tableWidget.item(row, 2).text())
                  for row in range(num_rows)]
         return items
 
     def xy1(self):
         # функция для запуска потока определения кординат
-        self.xy1_butt.setEnabled(False)
+        self.xy1_butt.setEnabled(False) # выключаем кнопку
         self.thread1 = Thread(
             target=lambda: self.xy_thread(1))  # создание потока
-        self.thread1.daemon = True
-        self.thread1.start()
+        self.thread1.daemon = True # устанавливаем значение на true
+        self.thread1.start() # для предототвращанения бага при непраильном закрытии приложения
 
     def xy2(self):
-        self.xy2_butt.setEnabled(False)
+        self.xy2_butt.setEnabled(False) 
         self.thread2 = Thread(target=lambda: self.xy_thread(2))
         self.thread2.daemon = True
         self.thread2.start()
@@ -109,12 +109,12 @@ class rtxt_app(QMainWindow, ui):
     def xy_thread(self, arg):
         # поток определения координат
         x, y = 0, 0
-        while self.flag:
+        while self.flag: # определяем координаты, пока не нажата гор. клавиша
             x, y = position()
-            sleep(0.01)
+            sleep(0.01) # для увелечения производительности ждём 0.01 секунду
         self.flag = True
         if arg == 1:
-            self.xy1_label.setText(
+            self.xy1_label.setText( # устанавливаем текст с xml тегами для сохранения форматирования
                 f'<html><head/><body><p align="center">x={x}, y={y}</p></body></html>')
             self.x1, self.y1 = x, y
             self.xy1_butt.setEnabled(True)
@@ -127,24 +127,24 @@ class rtxt_app(QMainWindow, ui):
     def keyPressEvent(self, event):
         # функция для горячих клавиш
         try:
-            if chr(event.key()) == self.deletetags(self.hotkey_butt.text()):
+            if chr(event.key()) == self.deletetags(self.hotkey_butt.text()): # если нажатая клавиша это гор. клавиша
                 self.flag = False
 
-            if self.ishotkey:
-                self.hotkey_butt.setText(chr(event.key()))
+            if self.ishotkey: # Если вызван флаг изм. горячей клавиши
+                self.hotkey_butt.setText(chr(event.key())) # устанавливаем новую гор. клавишу
                 self.hotkey_butt.setEnabled(True)
                 self.ishotkey = False
                 self.text_editor.setEnabled(True)
                 self.statusbar.showMessage('')
         except ValueError:
-            if self.ishotkey:
+            if self.ishotkey: # если клавиша не может быть горячей
                 self.statusbar.showMessage('ОШИБКА: неверная клавиша')
 
     def path_f(self):
         # функция для выбора пути сохранения скриншота
-        fname = QFileDialog.getExistingDirectory(self, 'Выбрать папку', '.')
+        fname = QFileDialog.getExistingDirectory(self, 'Выбрать папку', '.') # диалог выбора папки
         if fname:
-            self.screnhot_path = fname + '/screenhot.png'
+            self.screnhot_path = fname + '/screenhot.png' # путь для сохранения скриншота
             self.screenhotPath_label.setText(
                 f'<html><head/><body><p align="center">{self.screnhot_path}</p></body></html>')
 
@@ -157,11 +157,11 @@ class rtxt_app(QMainWindow, ui):
 
     def save_txt(self):
         # функция для выбора пути сохранения текстового файла
-        fname = QFileDialog.getSaveFileName(
+        fname = QFileDialog.getSaveFileName( # диалог выбора имени сохранения файла
             self, 'сохранить тестовый файл', 'text.txt')
         if fname[0]:
             with open(fname[0], 'w', encoding='utf-8') as txt:
-                txt.write(self.text_editor.toPlainText())
+                txt.write(self.text_editor.toPlainText()) # записываем в txt данные из панели
             self.statusbar.showMessage(
                 'УСПЕХ: файл сохранён в папке с программой')
 
@@ -176,9 +176,9 @@ class rtxt_app(QMainWindow, ui):
 
     def update_table(self, ditt):
         # функция для обновления данных в таблице
-        row_count = sum([len(j) for i, j in ditt.items()])
-        self.tableWidget.setRowCount(row_count)
-        id = 1
+        row_count = sum([len(j) for i, j in ditt.items()]) # считаем нужное количество рядов
+        self.tableWidget.setRowCount(row_count) # устанавливаем нужное количесвто рядов
+        id = 1 # (предупреждение можно игнорировать)
         for type, sp in ditt.items():
             for data in sp:
                 if data:
@@ -200,6 +200,7 @@ class rtxt_app(QMainWindow, ui):
     def analyze_thread(self):
         # поток анализа изображений
         self.progressChanged.emit(0)
+        # создание словаря с распр. по типам данным
         dict_types = {
             'date': [],
             'int': [],
@@ -207,7 +208,7 @@ class rtxt_app(QMainWindow, ui):
             'float': []
         }
         lang = self.language_comboBox.currentText()
-        images = glob(f'{self.images_folder}/*.png')
+        images = glob(f'{self.images_folder}/*.png') # ищем в папке все имена изображений с расширением .png
         for index, i in enumerate(images):
             self.statusbar.showMessage(i)
             # обработка изображения
@@ -238,7 +239,7 @@ class rtxt_app(QMainWindow, ui):
         if not self.sql_path:
             self.sql_path, t = QFileDialog.getOpenFileName(self, 'Выберите файл SQLite', '',
                                                         'SQLite Databases (*.sqlite);;All Files (*)')
-        if self.sql_path:
+        if self.sql_path: # если путь к sql уже был прописан
             try:
                 sql_writer(self.get_tableData(), database=self.sql_path)
                 self.statusbar.showMessage('УСПЕХ: данные в БД обновлены')
@@ -251,15 +252,15 @@ class rtxt_app(QMainWindow, ui):
             self.sql_path, t = QFileDialog.getOpenFileName(self, 'Выберите файл SQLite', '',
                                                         'SQLite Databases (*.sqlite);;All Files (*)')
         if self.sql_path:
-            confirm_dialog = QMessageBox()
-            confirm_dialog.setIcon(QMessageBox.Question)
+            confirm_dialog = QMessageBox() # создаём класс диалога
+            confirm_dialog.setIcon(QMessageBox.Question) # ставим иконку с вопросом
             confirm_dialog.setWindowTitle("Подтверждение")
             confirm_dialog.setText("Вы уверены, что хотите удалить все данные БД?")
-            confirm_dialog.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+            confirm_dialog.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel) # добавляем клавиши да и отмена
             result = confirm_dialog.exec_()
-            if result == QMessageBox.Ok:
+            if result == QMessageBox.Ok: # если рез. это кнопка ok
                 try:
-                    clear_database(database=self.sql_path)
+                    clear_database(database=self.sql_path) # полностью очищаем БД
                     self.statusbar.showMessage('УСПЕХ: данные в БД обновлены')
                 except:
                     self.statusbar.showMessage('ОШИБКА: проверьте состояние БД')
